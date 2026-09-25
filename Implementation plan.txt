@@ -1,0 +1,908 @@
+STEP 1 — Initial project analysis
+
+Paste this into Antigravity first:
+
+You are my lead ML engineer for the Business Entity Resolution Challenge.
+
+I want to build a highly competitive solution using ONLY the data and resources permitted by the challenge.
+
+IMPORTANT RULES:
+1. Do NOT use external business databases.
+2. Do NOT use Google Maps, web search, business APIs, government databases, geocoding APIs, or external entity-resolution services.
+3. Do NOT perform external data augmentation.
+4. Use only the provided training/test datasets and locally available Python libraries/models permitted by the challenge.
+5. The final model must comply with the challenge's MIT/Apache 2.0 model-license requirement and maximum 8B parameter requirement.
+6. Do not hard-code countries to US and India because France appears in the test set.
+7. Never leak validation information into training.
+
+FIRST TASK ONLY:
+Do NOT build the complete model yet.
+
+Analyze the project and dataset structure.
+
+Find:
+- dataset/train/train_source1.tsv
+- dataset/train/train_source2.tsv
+- dataset/train/train_source3.tsv
+- dataset/train/train_ground_truth.tsv
+- dataset/test/test_source1.tsv
+- dataset/test/test_source2.tsv
+- dataset/test/test_source3.tsv
+- utils/validate_submission.py
+- Documentation_template.md
+
+Read the challenge documentation carefully.
+
+Create a project plan and report:
+1. Number of rows in each dataset
+2. Columns and data types
+3. Missing-value statistics
+4. Number of unique entities
+5. Country distribution
+6. Business-name statistics
+7. Address statistics
+8. Ground-truth match-count distribution per Source-1 entity
+9. Percentage of Source-1 entities with zero, one, two, and multiple matches
+10. Number of S2/S3 records appearing in ground truth
+11. Any duplicate or suspicious records
+12. Potential data-quality issues
+13. Potential leakage risks
+
+Create:
+reports/01_dataset_analysis.md
+
+Also create:
+reports/README.md
+
+Do not modify the original datasets.
+
+At the end, summarize the findings and wait for my next instruction.
+STEP 2 — Build a proper validation strategy
+
+This step is extremely important because we need to optimize the actual competition metric, not generic accuracy.
+
+Now implement a leakage-safe validation framework.
+
+Competition metric:
+F0.5 = (1.25 * Precision * Recall) / (0.25 * Precision + Recall)
+
+The competition calculates F0.5 per Source-1 entity and then macro-averages across Source-1 entities.
+
+Singleton behavior is important:
+- correctly predicting no matches for a singleton gets 1.0
+- incorrectly predicting any match gets 0.0
+
+Requirements:
+
+1. Split the training Source-1 entities into train and validation groups.
+2. The split must happen at the Source-1 entity level.
+3. Never split individual candidate pairs independently.
+4. Ensure all records associated with a validation Source-1 entity are excluded from training.
+5. Make the split reproducible with a fixed random seed.
+6. Prefer stratification based on match-count groups if practical:
+   - 0 matches
+   - 1 match
+   - 2 matches
+   - 3+ matches
+
+Implement:
+
+src/validation.py
+
+Functions should include:
+
+create_entity_level_split(...)
+load_ground_truth(...)
+calculate_entity_f05(...)
+evaluate_predictions(...)
+evaluate_thresholds(...)
+
+The evaluator must correctly handle:
+- empty predictions
+- multiple matches
+- duplicate predictions
+- singleton Source-1 entities
+- macro averaging over Source-1 entities
+
+Create:
+reports/02_validation.md
+
+Include tests proving the evaluator works on small manually constructed examples.
+
+Do NOT train any ML model yet.
+
+Run the evaluator tests and report the results.
+STEP 3 — Build powerful normalization
+
+Now tell Antigravity to create the normalization layer.
+
+Build a robust multi-view normalization system for business names and addresses.
+
+Do NOT destroy the original values.
+
+For every record retain:
+
+original_name
+original_address
+original_country
+
+Create multiple derived representations.
+
+NAME REPRESENTATIONS:
+1. name_lower
+2. unicode-normalized name
+3. punctuation-normalized name
+4. whitespace-normalized name
+5. abbreviation-normalized name
+6. legal-suffix-normalized name
+7. compact name
+8. tokenized name
+9. name_without_common_legal_suffix
+10. sorted-token representation where appropriate
+
+Handle examples such as:
+Corp / Corporation
+Co / Company
+Ltd / Limited
+Pvt / Private
+Pvt Ltd / Private Limited
+Inc / Incorporated
+& / and
+
+Do NOT blindly remove meaningful words.
+
+ADDRESS REPRESENTATIONS:
+1. lower-case normalized
+2. unicode-normalized
+3. punctuation-normalized
+4. whitespace-normalized
+5. abbreviation-normalized
+6. compact address
+7. tokenized address
+8. numeric-token representation
+9. postal/PIN-code extraction where present
+10. possible city/state/region tokens where they can be derived from the text itself
+
+Do not use geocoding or external address databases.
+
+COUNTRY:
+Normalize whitespace/case but treat country as an open-set string.
+Never hard-code the allowed country set.
+
+Create:
+
+src/normalization.py
+
+Add unit tests for:
+- punctuation
+- whitespace
+- abbreviations
+- legal suffixes
+- ampersand
+- numbers
+- Unicode
+- missing values
+- empty strings
+
+Create:
+reports/03_normalization.md
+
+Run all tests.
+STEP 4 — Build multiple blocking strategies
+
+This is one of the most important prompts.
+
+Now implement a high-recall multi-stage candidate-generation/blocking system.
+
+Goal:
+Maximize true-match candidate recall while keeping the number of candidates manageable.
+
+IMPORTANT:
+A true match that is eliminated during blocking can never be recovered by the ML model.
+
+Implement multiple independent blocking strategies and take their UNION.
+
+At minimum implement:
+
+BLOCK 1:
+Exact normalized name
+
+BLOCK 2:
+Exact compact name
+
+BLOCK 3:
+Name prefix
+
+BLOCK 4:
+Important name-token overlap
+
+BLOCK 5:
+Name + country
+
+BLOCK 6:
+Address token blocking
+
+BLOCK 7:
+Postal/PIN/number-based blocking where available
+
+BLOCK 8:
+Name + address token blocking
+
+BLOCK 9:
+Character-ngram / approximate retrieval if computationally practical
+
+Do not use external search APIs.
+
+The blocking system must:
+- preserve Source-2 and Source-3 IDs
+- never produce Source-1 self-matches
+- support multiple matches
+- support zero matches
+- work with unseen countries such as France
+- be memory-conscious
+
+Create:
+
+src/blocking.py
+
+Implement:
+
+generate_candidates(source1, source2, source3, config)
+evaluate_blocking_recall(...)
+calculate_reduction_ratio(...)
+analyze_candidate_distribution(...)
+
+Evaluate blocking on the training validation setup using ground truth.
+
+For every blocking strategy report:
+- true matches
+- recovered true matches
+- blocking recall
+- total candidate pairs
+- average candidates per Source-1
+- median candidates
+- 95th percentile candidates
+- maximum candidates
+- reduction ratio
+
+Then evaluate the UNION of all blocks.
+
+Create:
+reports/04_blocking.md
+
+Do not train the ML model yet.
+
+Optimize blocking only for high recall and manageable candidate count.
+STEP 5 — Build similarity features
+Now build the pairwise feature-engineering system.
+
+For every candidate pair:
+Source-1 record ↔ Source-2 or Source-3 record
+
+Create a feature vector.
+
+NAME FEATURES:
+- exact original name
+- exact normalized name
+- exact compact name
+- normalized edit similarity
+- Levenshtein similarity
+- Jaro-Winkler similarity
+- token Jaccard
+- token overlap
+- character n-gram similarity
+- TF-IDF cosine similarity
+- token containment
+- token-count difference
+- length difference
+- common-token count
+
+ADDRESS FEATURES:
+- exact normalized address
+- Levenshtein similarity
+- Jaro-Winkler similarity
+- token Jaccard
+- token overlap
+- character n-gram similarity
+- TF-IDF cosine similarity
+- common numeric-token count
+- numeric-token agreement
+- postal/PIN agreement
+- address length difference
+
+CROSS-FIELD FEATURES:
+- name similarity × address similarity
+- strong-name + weak-address
+- weak-name + strong-address
+- strong-name + strong-address
+- country equality
+- source indicator
+- missingness indicators
+
+IMPORTANT:
+Missing values must be represented explicitly.
+Do not silently convert missing values into meaningful strings.
+
+Do not use external information.
+
+Create:
+
+src/features.py
+
+The feature pipeline must be fit only on training data where fitting is required.
+
+Avoid validation/test leakage.
+
+Save feature metadata and feature names.
+
+Create:
+reports/05_features.md
+
+Also benchmark feature-generation speed and memory usage.
+STEP 6 — Create positive and HARD negative pairs
+
+This is a major part of getting a strong model.
+
+Now build the training-pair generator.
+
+Positive pairs:
+Use train_ground_truth.tsv.
+
+For each true S1 → S2/S3 relationship:
+label = 1
+
+Negative pairs:
+Do NOT simply generate random negatives only.
+
+Generate hard negatives from the blocking candidates.
+
+Hard negatives should include examples such as:
+- very similar names but different businesses
+- same country but different business
+- similar address but different business
+- same/similar tokens
+- similar character n-grams
+- high fuzzy similarity but non-match
+- records retrieved by multiple blocking strategies but not present in ground truth
+
+Ensure all generated negatives are truly negative according to the available training ground truth.
+
+Do not accidentally label unknown pairs as negative if the ground truth format makes that unsafe.
+
+Use entity-level train/validation separation from validation.py.
+
+Prevent leakage.
+
+Create:
+
+src/training_pairs.py
+
+Produce statistics:
+- positive count
+- negative count
+- hard-negative count
+- positive/negative ratio
+- source2/source3 distribution
+- similarity distribution of positives
+- similarity distribution of hard negatives
+
+Create:
+reports/06_training_pairs.md
+
+Run validation checks.
+STEP 7 — Train baseline models
+Now train several baseline pair-matching models.
+
+Candidate models:
+1. Logistic Regression
+2. Random Forest
+3. Gradient Boosting / HistGradientBoosting
+4. XGBoost if already available and license/environment permits
+5. LightGBM if already available and license/environment permits
+6. CatBoost if useful and license/environment permits
+
+Do not use an external LLM yet.
+
+For every model:
+- train only on training Source-1 entities
+- predict validation candidates
+- calculate pair probabilities
+- convert probabilities to entity-level match lists
+- calculate competition-style macro F0.5
+
+Record:
+- precision
+- recall
+- F0.5
+- singleton performance
+- false merges
+- number of predicted matches
+- inference time
+- memory
+
+Create:
+
+src/train.py
+src/model.py
+
+Save models under:
+artifacts/models/
+
+Create:
+reports/07_baseline_models.md
+
+Do not select a model based on accuracy.
+The main selection metric is validation F0.5.
+
+Do not declare a winner until all models have been evaluated.
+STEP 8 — Threshold optimization
+
+This is where we specifically tune for the competition.
+
+Now optimize decision thresholds specifically for macro F0.5.
+
+For each trained model evaluate thresholds from approximately:
+0.05 through 0.99
+
+Use a sufficiently fine grid, then perform a finer search around the best region.
+
+For each threshold calculate:
+- macro F0.5
+- precision
+- recall
+- singleton accuracy
+- false merge count
+- average predicted matches per Source-1
+- number of entities predicted as singleton
+
+IMPORTANT:
+Do not optimize ordinary accuracy.
+Do not optimize F1.
+Optimize the exact competition-style macro F0.5.
+
+Also analyze threshold performance separately for:
+- singleton entities
+- one-match entities
+- multi-match entities
+- Source 2 candidates
+- Source 3 candidates
+
+Create:
+src/threshold_tuning.py
+
+Create:
+reports/08_threshold_tuning.md
+
+Save the selected threshold configuration under:
+artifacts/config/best_thresholds.json
+
+Do not hard-code the threshold into the source code.
+STEP 9 — Add confidence + margin logic
+Now build a second-stage decision system on top of the model probabilities.
+
+For each Source-1 entity calculate:
+- best candidate score
+- second-best score
+- third-best score
+- best-second margin
+- number of candidates above threshold
+- number of very-high-confidence candidates
+
+Investigate whether margin improves validation F0.5.
+
+Test:
+1. pure threshold
+2. threshold + margin
+3. threshold + confidence bands
+4. threshold + candidate count constraints
+5. threshold + singleton confidence rule
+
+Do NOT arbitrarily impose one-to-one matching.
+
+The challenge allows one Source-1 entity to match zero, one, or many Source-2/Source-3 entities.
+
+The system must therefore allow multiple genuine matches.
+
+However, investigate suspicious clusters of many high-scoring candidates and determine whether they correspond to false merges in validation.
+
+Run experiments and keep only changes that improve validation F0.5.
+
+Create:
+src/decision.py
+
+Create:
+reports/09_decision_rules.md
+STEP 10 — Cross-source reasoning
+Now add Source-2/Source-3 cross-source consistency features.
+
+For each Source-1 entity, analyze its candidate matches across Source 2 and Source 3.
+
+Useful signals may include:
+- similar name evidence in both sources
+- similar address evidence in both sources
+- compatible country
+- consistent business tokens
+- agreement between independent candidate evidence
+
+Do NOT assume every Source-1 entity must have both an S2 and S3 match.
+
+Do NOT assume one-to-one matching.
+
+Do not invent relationships not supported by the data.
+
+Treat cross-source information only as additional evidence.
+
+Run ablation experiments:
+A. model without cross-source features
+B. model with cross-source features
+
+Compare validation macro F0.5.
+
+Keep the modification only if validation results support it.
+
+Create:
+reports/10_cross_source.md
+STEP 11 — Model ablation and final architecture
+
+Now make Antigravity find out what actually matters.
+
+Perform a systematic ablation study.
+
+Start from the current best pipeline.
+
+Remove one component at a time:
+
+1. No name fuzzy features
+2. No address fuzzy features
+3. No TF-IDF
+4. No Jaccard
+5. No Levenshtein/Jaro-Winkler
+6. No hard negatives
+7. No margin
+8. No cross-source features
+9. Single blocking strategy
+10. Multi-block UNION
+
+For each experiment record:
+- blocking recall
+- validation F0.5
+- precision
+- recall
+- singleton score
+- false merge count
+- runtime
+
+Create:
+reports/11_ablation.md
+
+Use evidence from validation to determine which components should remain.
+
+Do not assume complexity improves score.
+STEP 12 — Stress-test false positives
+
+Because F₀.₅ is precision-heavy, specifically attack your own model.
+
+Now perform a false-positive audit.
+
+Find the highest-scoring validation pairs that are actually WRONG.
+
+Group false positives by reason:
+- common business name
+- address similarity
+- abbreviation issue
+- number collision
+- token collision
+- city collision
+- transliteration
+- legal suffix
+- missing address
+- missing name
+- other
+
+Print representative examples with:
+S1 ID
+S1 name
+S1 address
+candidate ID
+candidate name
+candidate address
+model score
+feature values
+ground-truth label
+
+Do not use external information to decide whether a pair is correct.
+
+Use only the provided training ground truth.
+
+Create:
+reports/12_false_positive_audit.md
+
+Then propose feature/rule changes that specifically reduce these false merges.
+
+Test every proposed change on the validation set.
+Keep only improvements supported by validation F0.5.
+STEP 13 — Optimize the final pipeline
+Now assemble the best validated pipeline.
+
+Pipeline must be:
+
+LOAD
+→ NORMALIZE
+→ BLOCK
+→ GENERATE FEATURES
+→ SCORE
+→ DECISION
+→ ENTITY-LEVEL OUTPUT
+
+Requirements:
+- deterministic
+- reproducible
+- fixed random seeds
+- no external APIs
+- no external business data
+- no hard-coded US/India-only assumptions
+- supports France and future unseen country strings
+- supports zero matches
+- supports one match
+- supports multiple matches
+- no duplicate matched IDs
+- no S1 IDs in matched_entity_ids
+- only valid S2/S3 IDs
+- all S1 test IDs represented
+
+Create:
+
+src/main.py
+
+Running:
+
+python src/main.py --mode train
+python src/main.py --mode validate
+python src/main.py --mode test
+
+must work.
+
+Create:
+README.md
+
+with exact commands.
+STEP 14 — Generate test predictions
+Now run the final validated pipeline on the complete test set.
+
+IMPORTANT:
+Do not use test labels because none are available.
+
+Generate:
+
+output/matching_results.tsv
+
+with exactly:
+
+source1_entity_id<TAB>matched_entity_ids
+
+Rules:
+- exactly one row for every test Source-1 entity
+- empty matched_entity_ids for predicted singleton/no-match entities
+- no duplicate IDs
+- only S2/S3 IDs
+- IDs must exist in test data
+- preserve valid entity IDs
+- no S1 self-match
+
+Also generate:
+
+output/candidate_pairs.tsv
+
+This must contain the FINAL candidate set actually passed into the final matching model, not an earlier intermediate blocking set.
+
+Ensure:
+every predicted match appears in candidate_pairs.tsv.
+
+Create:
+reports/13_test_prediction.md
+
+Report:
+- total S1 test entities
+- predicted singleton count
+- predicted match count
+- average matches per S1
+- S2 matches
+- S3 matches
+- candidate count statistics
+
+The distinction between the final candidate set and an earlier blocking stage is explicitly required by the challenge.
+
+STEP 15 — Validate the submission
+Now validate the final submission using the official validator.
+
+Run exactly:
+
+python3 utils/validate_submission.py \
+    --matching output/matching_results.tsv \
+    --candidate output/candidate_pairs.tsv \
+    --test-dir dataset/test
+
+If validation fails:
+1. inspect the exact error
+2. fix the pipeline
+3. regenerate outputs
+4. rerun validation
+
+Do not manually edit the output as a one-time patch.
+Fix the source pipeline so the output is reproducible.
+
+Do not continue until the validator returns PASS.
+
+Create:
+reports/14_submission_validation.md
+
+Include the validator result and final output statistics.
+
+The official validator is specifically provided by the challenge for this purpose.
+
+STEP 16 — Create methodology document
+Now complete Documentation_template.md.
+
+Document the actual implementation, not an imaginary approach.
+
+Include:
+
+1. Methodology
+2. Dataset understanding
+3. Data preprocessing
+4. Normalization
+5. Blocking/candidate generation
+6. Candidate recall
+7. Feature engineering
+8. Training-pair construction
+9. Hard-negative strategy
+10. ML model architecture
+11. Threshold optimization
+12. Singleton handling
+13. Decision rules
+14. Validation methodology
+15. Validation F0.5 results
+16. Ablation experiments
+17. False-positive analysis
+18. Computational requirements
+19. Reproducibility instructions
+20. Fair-play compliance
+21. Model/library licenses
+
+Do not claim results that were not actually measured.
+
+Do not claim external datasets or information were used.
+
+Keep all methodology consistent with the actual source code.
+STEP 17 — Final reproducibility test
+Perform a clean reproducibility test.
+
+Pretend another person received only:
+- the challenge datasets
+- code/business_entity_resolution/
+- requirements.txt
+- README.md
+
+Verify that the pipeline can reproduce:
+- candidate_pairs.tsv
+- matching_results.tsv
+
+Check:
+1. imports
+2. dependencies
+3. relative paths
+4. random seeds
+5. model files
+6. configuration files
+7. output directories
+8. command-line arguments
+
+Fix anything that prevents reproduction.
+
+Then run the official submission validator one final time.
+
+Do not alter the original datasets.
+STEP 18 — Build final ZIP
+Create the final submission package exactly according to the challenge requirements.
+
+Structure:
+
+<team_name>_submission.zip
+│
+├── output/
+│   ├── matching_results.tsv
+│   └── candidate_pairs.tsv
+│
+├── code/
+│   └── business_entity_resolution/
+│       ├── src/
+│       ├── README.md
+│       └── requirements.txt
+│
+└── Documentation_template.md
+
+Before creating the ZIP:
+
+1. Verify matching_results.tsv exists.
+2. Verify candidate_pairs.tsv exists.
+3. Verify every S1 test entity appears exactly once.
+4. Verify no invalid IDs.
+5. Verify no duplicate matched IDs.
+6. Verify every final match is present in candidate_pairs.tsv.
+7. Run the official validator.
+8. Verify README contains exact reproduction commands.
+9. Verify requirements are pinned where practical.
+10. Verify all model/library licenses comply with the challenge.
+11. Verify no external-data lookup code exists.
+12. Verify no API keys or secrets are included.
+
+Create a final report:
+
+reports/15_final_submission.md
+
+containing:
+- final validation status
+- validation F0.5
+- blocking recall
+- candidate statistics
+- singleton statistics
+- final model
+- threshold
+- reproducibility command
+- ZIP path
+
+Only create the ZIP after all checks pass.
+🚀 One extra prompt I strongly recommend
+
+After all of the above, give Antigravity this:
+
+You are now in FINAL OPTIMIZATION MODE.
+
+Do not rewrite the entire project blindly.
+
+Your objective is to improve validation macro F0.5 while preserving submission validity.
+
+Use the current best pipeline as the baseline.
+
+Perform controlled experiments only.
+
+Potential areas to investigate:
+
+1. Better hard-negative sampling
+2. Better blocking recall
+3. Character n-gram ranges
+4. TF-IDF configurations
+5. Name/address feature combinations
+6. Threshold optimization
+7. Thresholds separately for S2 and S3 if validation supports it
+8. Singleton decision logic
+9. Confidence margins
+10. Candidate-count features
+11. Country-aware features without hard-coding countries
+12. Address-number matching
+13. Token normalization
+14. Legal suffix handling
+15. Source-specific noise patterns
+
+For every experiment:
+
+BASELINE F0.5
+NEW F0.5
+DELTA
+PRECISION
+RECALL
+FALSE MERGES
+SINGLETON PERFORMANCE
+RUNTIME
+
+Never accept a change merely because it sounds better.
+
+Accept a change only when validation evidence supports it.
+
+Avoid overfitting the validation set:
+- keep a final untouched validation subset if possible
+- don't repeatedly tune against the same tiny subset without monitoring generalization
+
+Do not use external business information.
+
+At the end, retain the best reproducible pipeline and regenerate the final outputs.
