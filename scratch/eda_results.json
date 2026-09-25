@@ -1,0 +1,595 @@
+{
+  "row_counts": {
+    "train_source1": 2206821,
+    "train_source2": 5034616,
+    "train_source3": 5285603,
+    "train_ground_truth": 2206821,
+    "test_source1": 1732544,
+    "test_source2": 4887273,
+    "test_source3": 5082316
+  },
+  "columns": {
+    "train_source1": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country"
+    ],
+    "train_source2": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country"
+    ],
+    "train_source3": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country"
+    ],
+    "train_ground_truth": [
+      "source1_entity_id",
+      "matched_entity_ids"
+    ],
+    "test_source1": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country"
+    ],
+    "test_source2": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country"
+    ],
+    "test_source3": [
+      "entity_id",
+      "business_name",
+      "business_address",
+      "country"
+    ]
+  },
+  "missing_stats": {
+    "train_source1": {
+      "entity_id": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_name": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_address": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "country": {
+        "null_count": 0,
+        "null_pct": 0.0
+      }
+    },
+    "train_source2": {
+      "entity_id": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_name": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_address": {
+        "null_count": 168967,
+        "null_pct": 3.3561
+      },
+      "country": {
+        "null_count": 0,
+        "null_pct": 0.0
+      }
+    },
+    "train_source3": {
+      "entity_id": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_name": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_address": {
+        "null_count": 175916,
+        "null_pct": 3.3282
+      },
+      "country": {
+        "null_count": 0,
+        "null_pct": 0.0
+      }
+    },
+    "train_ground_truth": {
+      "source1_entity_id": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "matched_entity_ids": {
+        "null_count": 123247,
+        "null_pct": 5.5848
+      }
+    },
+    "test_source1": {
+      "entity_id": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_name": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_address": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "country": {
+        "null_count": 0,
+        "null_pct": 0.0
+      }
+    },
+    "test_source2": {
+      "entity_id": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_name": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_address": {
+        "null_count": 129408,
+        "null_pct": 2.6479
+      },
+      "country": {
+        "null_count": 0,
+        "null_pct": 0.0
+      }
+    },
+    "test_source3": {
+      "entity_id": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_name": {
+        "null_count": 0,
+        "null_pct": 0.0
+      },
+      "business_address": {
+        "null_count": 136098,
+        "null_pct": 2.6779
+      },
+      "country": {
+        "null_count": 0,
+        "null_pct": 0.0
+      }
+    }
+  },
+  "unique_entities": {
+    "train_source1": {
+      "unique_ids": 2206821,
+      "duplicate_ids": 0
+    },
+    "train_source2": {
+      "unique_ids": 5034616,
+      "duplicate_ids": 0
+    },
+    "train_source3": {
+      "unique_ids": 5285603,
+      "duplicate_ids": 0
+    },
+    "train_ground_truth": {
+      "unique_ids": 2206821,
+      "duplicate_ids": 0
+    },
+    "test_source1": {
+      "unique_ids": 1732544,
+      "duplicate_ids": 0
+    },
+    "test_source2": {
+      "unique_ids": 4887273,
+      "duplicate_ids": 0
+    },
+    "test_source3": {
+      "unique_ids": 5082316,
+      "duplicate_ids": 0
+    }
+  },
+  "country_dist": {
+    "train_source1": {
+      "US": {
+        "count": 1323633,
+        "pct": 59.98
+      },
+      "India": {
+        "count": 883188,
+        "pct": 40.02
+      }
+    },
+    "train_source2": {
+      "India": {
+        "count": 2017799,
+        "pct": 40.08
+      },
+      "US": {
+        "count": 3016817,
+        "pct": 59.92
+      }
+    },
+    "train_source3": {
+      "US": {
+        "count": 3170056,
+        "pct": 59.98
+      },
+      "India": {
+        "count": 2115547,
+        "pct": 40.02
+      }
+    },
+    "test_source1": {
+      "US": {
+        "count": 663106,
+        "pct": 38.27
+      },
+      "France": {
+        "count": 259452,
+        "pct": 14.98
+      },
+      "India": {
+        "count": 809986,
+        "pct": 46.75
+      }
+    },
+    "test_source2": {
+      "India": {
+        "count": 2312565,
+        "pct": 47.32
+      },
+      "France": {
+        "count": 703378,
+        "pct": 14.39
+      },
+      "US": {
+        "count": 1871330,
+        "pct": 38.29
+      }
+    },
+    "test_source3": {
+      "India": {
+        "count": 2405000,
+        "pct": 47.32
+      },
+      "France": {
+        "count": 731615,
+        "pct": 14.4
+      },
+      "US": {
+        "count": 1945701,
+        "pct": 38.28
+      }
+    }
+  },
+  "business_name_stats": {
+    "train_source1": {
+      "char_length": {
+        "min": 3,
+        "max": 105,
+        "mean": 24.03,
+        "median": 24,
+        "p5": 12,
+        "p95": 37
+      },
+      "word_count": {
+        "min": 1,
+        "max": 16,
+        "mean": 3.55,
+        "median": 4
+      }
+    },
+    "train_source2": {
+      "char_length": {
+        "min": 2,
+        "max": 104,
+        "mean": 25.1,
+        "median": 25,
+        "p5": 12,
+        "p95": 40
+      },
+      "word_count": {
+        "min": 1,
+        "max": 15,
+        "mean": 3.5,
+        "median": 4
+      }
+    },
+    "train_source3": {
+      "char_length": {
+        "min": 2,
+        "max": 123,
+        "mean": 25.2,
+        "median": 25,
+        "p5": 11,
+        "p95": 42
+      },
+      "word_count": {
+        "min": 1,
+        "max": 18,
+        "mean": 3.53,
+        "median": 4
+      }
+    },
+    "test_source1": {
+      "char_length": {
+        "min": 3,
+        "max": 92,
+        "mean": 23.84,
+        "median": 24,
+        "p5": 12,
+        "p95": 36
+      },
+      "word_count": {
+        "min": 1,
+        "max": 14,
+        "mean": 3.52,
+        "median": 4
+      }
+    },
+    "test_source2": {
+      "char_length": {
+        "min": 2,
+        "max": 102,
+        "mean": 25.7,
+        "median": 25,
+        "p5": 12,
+        "p95": 42
+      },
+      "word_count": {
+        "min": 1,
+        "max": 15,
+        "mean": 3.59,
+        "median": 4
+      }
+    },
+    "test_source3": {
+      "char_length": {
+        "min": 2,
+        "max": 103,
+        "mean": 25.66,
+        "median": 25,
+        "p5": 11,
+        "p95": 42
+      },
+      "word_count": {
+        "min": 1,
+        "max": 16,
+        "mean": 3.6,
+        "median": 4
+      }
+    }
+  },
+  "address_stats": {
+    "train_source1": {
+      "char_length": {
+        "min": 11,
+        "max": 256,
+        "mean": 52.07,
+        "median": 41,
+        "p5": 27,
+        "p95": 103
+      },
+      "word_count": {
+        "min": 2,
+        "max": 43,
+        "mean": 8.03,
+        "median": 7
+      }
+    },
+    "train_source2": {
+      "char_length": {
+        "min": 0,
+        "max": 249,
+        "mean": 46.23,
+        "median": 37,
+        "p5": 22,
+        "p95": 96
+      },
+      "word_count": {
+        "min": 0,
+        "max": 46,
+        "mean": 7.29,
+        "median": 6
+      }
+    },
+    "train_source3": {
+      "char_length": {
+        "min": 0,
+        "max": 240,
+        "mean": 46.71,
+        "median": 42,
+        "p5": 22,
+        "p95": 91
+      },
+      "word_count": {
+        "min": 0,
+        "max": 43,
+        "mean": 7.17,
+        "median": 6
+      }
+    },
+    "test_source1": {
+      "char_length": {
+        "min": 11,
+        "max": 268,
+        "mean": 57.21,
+        "median": 50,
+        "p5": 28,
+        "p95": 105
+      },
+      "word_count": {
+        "min": 2,
+        "max": 43,
+        "mean": 8.59,
+        "median": 8
+      }
+    },
+    "test_source2": {
+      "char_length": {
+        "min": 0,
+        "max": 269,
+        "mean": 50.41,
+        "median": 43,
+        "p5": 23,
+        "p95": 99
+      },
+      "word_count": {
+        "min": 0,
+        "max": 43,
+        "mean": 7.8,
+        "median": 7
+      }
+    },
+    "test_source3": {
+      "char_length": {
+        "min": 0,
+        "max": 267,
+        "mean": 48.74,
+        "median": 43,
+        "p5": 22,
+        "p95": 94
+      },
+      "word_count": {
+        "min": 0,
+        "max": 43,
+        "mean": 7.51,
+        "median": 7
+      }
+    }
+  },
+  "address_patterns": {
+    "train_source1": {
+      "has_digits": 2129784,
+      "has_6digit_in_pin_pattern": 1656,
+      "has_5digit_us_zip_pattern": 145601
+    },
+    "train_source2": {
+      "has_digits": 4563675,
+      "has_6digit_in_pin_pattern": 41851,
+      "has_5digit_us_zip_pattern": 327300
+    },
+    "train_source3": {
+      "has_digits": 4799297,
+      "has_6digit_in_pin_pattern": 42140,
+      "has_5digit_us_zip_pattern": 343630
+    },
+    "test_source1": {
+      "has_digits": 1660706,
+      "has_6digit_in_pin_pattern": 826,
+      "has_5digit_us_zip_pattern": 74808
+    },
+    "test_source2": {
+      "has_digits": 4529243,
+      "has_6digit_in_pin_pattern": 26789,
+      "has_5digit_us_zip_pattern": 221147
+    },
+    "test_source3": {
+      "has_digits": 4700823,
+      "has_6digit_in_pin_pattern": 26777,
+      "has_5digit_us_zip_pattern": 229317
+    }
+  },
+  "duplicate_checks": {
+    "train_source1": {
+      "exact_full_duplicate_rows": 0,
+      "duplicate_records_excluding_id": 0
+    },
+    "train_source2": {
+      "exact_full_duplicate_rows": 0,
+      "duplicate_records_excluding_id": 25873
+    },
+    "train_source3": {
+      "exact_full_duplicate_rows": 0,
+      "duplicate_records_excluding_id": 18860
+    },
+    "test_source1": {
+      "exact_full_duplicate_rows": 0,
+      "duplicate_records_excluding_id": 0
+    },
+    "test_source2": {
+      "exact_full_duplicate_rows": 0,
+      "duplicate_records_excluding_id": 22641
+    },
+    "test_source3": {
+      "exact_full_duplicate_rows": 0,
+      "duplicate_records_excluding_id": 16293
+    }
+  },
+  "id_overlap": {
+    "s1_overlap": 0,
+    "s2_overlap": 0,
+    "s3_overlap": 0
+  },
+  "gt_match_stats": {
+    "total_s1_in_gt": 2206821,
+    "min_matches": 0,
+    "max_matches": 11,
+    "mean_matches": 3.4613,
+    "median_matches": 3,
+    "quantile_25": 2,
+    "quantile_75": 5,
+    "quantile_90": 6,
+    "quantile_99": 8
+  },
+  "gt_match_count_frequency": {
+    "0": 123247,
+    "1": 119157,
+    "2": 375212,
+    "3": 530841,
+    "4": 484115,
+    "5": 321957,
+    "6": 164868,
+    "7": 63968,
+    "8": 18680,
+    "9": 4205,
+    "10": 534,
+    "11": 37
+  },
+  "gt_match_distribution_pct": {
+    "zero_matches_singletons": {
+      "count": 123247,
+      "pct": 5.58
+    },
+    "one_match": {
+      "count": 119157,
+      "pct": 5.4
+    },
+    "two_matches": {
+      "count": 375212,
+      "pct": 17.0
+    },
+    "three_or_more_matches": {
+      "count": 1589205,
+      "pct": 72.01
+    }
+  },
+  "s2_s3_ground_truth_coverage": {
+    "total_s2_matches_in_gt": 3693619,
+    "unique_s2_matched_entities": 3693619,
+    "total_s2_records_in_train": 5034616,
+    "s2_matched_pct": 73.36,
+    "s2_distractors_unmatched": 1340997,
+    "total_s3_matches_in_gt": 3944746,
+    "unique_s3_matched_entities": 3944746,
+    "total_s3_records_in_train": 5285603,
+    "s3_matched_pct": 74.63,
+    "s3_distractors_unmatched": 1340857
+  },
+  "multi_matched_candidates": {
+    "s2_entities_matched_to_multiple_s1": 0,
+    "s3_entities_matched_to_multiple_s1": 0
+  }
+}
